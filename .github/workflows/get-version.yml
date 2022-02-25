@@ -10,13 +10,13 @@ on:
     outputs:
       version:
         description: "Project version"
-        value: ${{ steps.get-version.outputs.version }}
+        value: ${{ jobs.version.outputs.version }}
       is-new:
         description: "if true, Project version is new version"
-        value: ${{ steps.get-version.outputs.is-new }}
+        value: ${{ jobs.version.outputs.is-new }}
       is-prerelease:
         description: "if true, Project version is pre-release version"
-        value: ${{ steps.get-version.outputs.is-prerelease }}
+        value: ${{ jobs.version.outputs.is-prerelease }}
 
 env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
@@ -28,6 +28,10 @@ env:
 jobs:
   version:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
+      is-new: ${{ steps.get-version.outputs.is-new }}
+      is-prerelease: ${{ steps.get-version.outputs.is-prerelease }}
     steps:
       - uses: actions/checkout@v2
       - name: Get Version Action

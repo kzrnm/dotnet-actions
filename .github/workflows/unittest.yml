@@ -26,7 +26,7 @@ env:
   NUGET_PACKAGES: ${{ inputs.nuget-path }}
 
 jobs:
-  format:
+  unittest:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

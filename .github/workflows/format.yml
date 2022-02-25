@@ -33,7 +33,7 @@ jobs:
           dotnet-version: ${{ inputs.dotnet-version }}
       - uses: actions/cache@v2
         with:
-          path: ${{ (inputs.nuget-path == '' &&  '~/.nuget/packages') || inputs.nuget-path }}
+          path: ${{ (inputs.nuget-path != '' && inputs.nuget-path ) || '~/.nuget/packages' }}
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
           restore-keys: |
             ${{ runner.os }}-nuget-

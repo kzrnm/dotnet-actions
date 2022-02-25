@@ -9,9 +9,13 @@ on:
       dotnet-version:
         required: true
         type: string
+      test-logger:
+        required: false
+        default: ""
+        type: string
       nuget-path:
         required: false
-        default: ~/.nuget/packages
+        default: ""
         type: string
 
 env:
@@ -32,11 +36,11 @@ jobs:
           dotnet-version: ${{ inputs.dotnet-version }}
       - uses: actions/cache@v2
         with:
-          path: ${{ (inputs.nuget-path == '' &&  '~/.nuget/packages') || inputs.nuget-path }}
+          path: ${{ (inputs.nuget-path != '' && inputs.nuget-path ) || '~/.nuget/packages' }}
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
       - name: Build
         run: dotnet build ${{ inputs.target }}
       - name: Test
-        run: dotnet test ${{ inputs.target }} --no-build --logger GitHubActions
+        run: dotnet test ${{ inputs.target }} --no-build ${{ (inputs.test-logger != '' &&  format('--logger {0}', 'inputs.test-logger')) || '' }}

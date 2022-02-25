@@ -43,4 +43,4 @@ jobs:
       - name: Build
         run: dotnet build ${{ inputs.target }}
       - name: Test
-        run: dotnet test ${{ inputs.target }} --no-build ${{ (inputs.test-logger != '' &&  format('--logger {0}', 'inputs.test-logger')) || '' }}
+        run: dotnet test ${{ inputs.target }} --no-build ${{ (inputs.test-logger != '' &&  format('--logger {0}', inputs.test-logger)) || '' }}

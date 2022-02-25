@@ -1,4 +1,4 @@
-name: format
+name: Format
 
 on:
   workflow_call:
@@ -20,6 +20,7 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_NOLOGO: true
   NUGET_XMLDOC_MODE: skip
+  NUGET_PACKAGES: ${{ inputs.nuget-path }}
 
 jobs:
   format:

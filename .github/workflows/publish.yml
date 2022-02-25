@@ -1,0 +1,50 @@
+name: Publish NuGet & Release
+
+on:
+  workflow_call:
+    inputs:
+      artifact-name:
+        description: Artifact name
+        required: true
+        type: string
+      version:
+        description: Build version
+        required: true
+        type: string
+      is-prerelease:
+        description: "if true, Create release as prerelease"
+        required: false
+        default: false
+        type: boolean
+    secrets:
+      NUGET_KEY:
+        description: "NuGet API key"
+        required: true
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: dist
+      - name: Upload nuget
+        run: dotnet nuget push "./dist/*.nupkg" --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_KEY }}
+      - name: Push tag
+        id: tag-version
+        uses: mathieudutour/github-tag-action@v5
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          custom_tag: ${{ inputs.version }}
+          tag_prefix: "v"
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        id: create-release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ steps.tag-version.outputs.new_tag }}
+          name: Version ${{ inputs.version }}
+          body: https://github.com/${{ github.repository }}/blob/${{ steps.tag-version.outputs.new_tag }}/CHANGELOG.md
+          artifacts: "./dist/*.nupkg,./dist/*.snupkg"
+          prerelease: ${{ inputs.is-prerelease }}

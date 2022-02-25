@@ -1,0 +1,58 @@
+name: "Get Vesion"
+description: "Get .NET project version"
+
+inputs:
+  project-path:
+    description: "Path of csproj file that contains version tag"
+    required: true
+  GITHUB_TOKEN:
+    description: "GitHub token"
+    required: true
+
+outputs:
+  version:
+    description: "Project version"
+    value: ${{ steps.get-version.outputs.version }}
+  is-new:
+    description: "if true, Project version is new version"
+    value: ${{ steps.is-new-version.outputs.is-new }}
+  is-prerelease:
+    description: "if true, Project version is pre-release version"
+    value: ${{ steps.is-new-version.outputs.is-prerelease }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get version
+      uses: kzrnm/get-net-sdk-project-versions-action@v1
+      id: get-version
+      with:
+        proj-path: ${{ inputs.project-path }}
+    - name: Check tag
+      uses: mukunku/tag-exists-action@v1.0.0
+      id: check-tag
+      with:
+        tag: v${{ steps.get-version.outputs.version }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+    - name: is new version?
+      shell: bash
+      id: is-new-version
+      run: |
+        IS_PRE=false
+        IS_NEW=false
+        if [ "${{ steps.get-version.outputs.version }}" = "${GITHUB_REF#refs/tags/v}" ]; then
+          echo "create version tag event: $GITHUB_REF"
+          if [ "${{ steps.get-version.outputs.version-suffix }}" != "" ]; then
+            IS_PRE=true
+          fi
+          IS_NEW=true
+        elif [ "${{ steps.check-tag.outputs.exists }}" = "false" ]; then
+          echo "new version tag project: ${{ steps.get-version.outputs.version }}"
+          if [ "${{ steps.get-version.outputs.version-suffix }}" != "" ]; then
+            IS_PRE=true
+          fi
+          IS_NEW=true
+        fi
+        echo "::set-output name=is-new::$IS_NEW"
+        echo "::set-output name=is-prerelease::$IS_PRE"

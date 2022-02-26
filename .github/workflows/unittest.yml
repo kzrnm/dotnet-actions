@@ -13,7 +13,13 @@ on:
         required: false
         default: ""
         type: string
+      os:
+        description: Running os
+        required: false
+        default: ubuntu-latest
+        type: string
       nuget-path:
+        description: path of $NUGET_PACKAGES
         required: false
         default: ""
         type: string
@@ -27,7 +33,7 @@ env:
 
 jobs:
   unittest:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.os }}
     steps:
       - uses: actions/checkout@v2
       - name: Setup .NET SDK

@@ -37,7 +37,7 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: ${{ inputs.dotnet-version }}
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ${{ (inputs.nuget-path != '' && inputs.nuget-path ) || '~/.nuget/packages' }}
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}

@@ -39,4 +39,3 @@ jobs:
         id: get-version
         with:
           project-path: ${{ inputs.project-path }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

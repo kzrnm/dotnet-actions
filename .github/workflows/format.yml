@@ -8,7 +8,7 @@ on:
         type: string
       dotnet-version:
         required: false
-        default: 6.0.x
+        default: 7.0.x
         type: string
       os:
         description: Running os
@@ -34,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v2
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ inputs.dotnet-version }}
       - uses: actions/cache@v3

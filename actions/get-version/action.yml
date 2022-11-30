@@ -5,9 +5,6 @@ inputs:
   project-path:
     description: "Path of csproj file that contains version tag"
     required: true
-  GITHUB_TOKEN:
-    description: "GitHub token"
-    required: true
 
 outputs:
   version:
@@ -29,12 +26,12 @@ runs:
       with:
         proj-path: ${{ inputs.project-path }}
     - name: Check tag
-      uses: mukunku/tag-exists-action@v1.0.0
+      uses: mukunku/tag-exists-action@v1.1.0
       id: check-tag
       with:
         tag: v${{ steps.get-version.outputs.version }}
       env:
-        GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ github.token }}
     - name: is new version?
       shell: bash
       id: is-new-version

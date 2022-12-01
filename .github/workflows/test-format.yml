@@ -10,14 +10,6 @@ env:
   NUGET_XMLDOC_MODE: skip
 
 jobs:
-  workspace:
-    runs-on: ubuntu-latest
-    outputs:
-      workspace: ${{ steps.workspace.outputs.workspace }}
-    steps:
-      - id: workspace
-        run: echo "::set-output name=workspace::${{ github.workspace }}"
-
   format-default-nulget:
     uses: ./.github/workflows/format.yml
     with:
@@ -25,7 +17,6 @@ jobs:
 
   format-local-nulget:
     uses: ./.github/workflows/format.yml
-    needs: ["workspace"]
     with:
       target: Tests/SimpleProject/SimpleProject.csproj
-      nuget-path: ${{ needs.workspace.outputs.workspace }}/.nuget/packages
+      nuget-path: ${{ github.workspace }}/.nuget/packages

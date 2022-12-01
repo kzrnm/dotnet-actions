@@ -49,5 +49,5 @@ runs:
           fi
           IS_NEW=true
         fi
-        echo "::set-output name=is-new::$IS_NEW"
-        echo "::set-output name=is-prerelease::$IS_PRE"
+        echo "is-new=$IS_NEW" >> "$GITHUB_OUTPUT"
+        echo "is-prerelease=$IS_PRE" >> "$GITHUB_OUTPUT"

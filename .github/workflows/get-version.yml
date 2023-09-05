@@ -33,7 +33,7 @@ jobs:
       is-new: ${{ steps.get-version.outputs.is-new }}
       is-prerelease: ${{ steps.get-version.outputs.is-prerelease }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Get Version Action
         uses: kzrnm/dotnet-actions/actions/get-version@v1
         id: get-version

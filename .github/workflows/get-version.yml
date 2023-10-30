@@ -3,6 +3,11 @@ name: Get Version
 on:
   workflow_call:
     inputs:
+      prefix:
+        description: Prefix of version tag
+        type: string
+        required: false
+        default: 'v'
       project-path:
         description: "Path of csproj file that contains version tag"
         required: true
@@ -44,3 +49,4 @@ jobs:
         id: get-version
         with:
           project-path: ${{ inputs.project-path }}
+          prefix: ${{ inputs.prefix }}

@@ -45,7 +45,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Get Version Action
-        uses: kzrnm/dotnet-actions/actions/get-version@v1
+        uses: kzrnm/dotnet-actions/actions/get-version@v2
         id: get-version
         with:
           project-path: ${{ inputs.project-path }}

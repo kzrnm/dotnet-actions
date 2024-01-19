@@ -40,7 +40,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ inputs.dotnet-version }}
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ${{ (inputs.nuget-path != '' && inputs.nuget-path ) || '~/.nuget/packages' }}
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Build.props') }}

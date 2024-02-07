@@ -26,7 +26,6 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
@@ -36,17 +35,13 @@ jobs:
         run: dotnet nuget push "./dist/*.nupkg" --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_KEY }}
       - name: New tag
         id: tag-version
-        run: |
-          TAG="v${{ inputs.version }}"
-          echo "new-tag=$TAG" >> "$GITHUB_OUTPUT"
-          git tag "$TAG"
-          git push origin "$TAG"
+        run: echo "new-tag=v${{ inputs.version }}" | tee -a "$GITHUB_OUTPUT"
       - name: Create release
         uses: ncipollo/release-action@v1
         id: create-release
         with:
           tag: ${{ steps.tag-version.outputs.new-tag }}
           name: Version ${{ inputs.version }}
-          body: https://github.com/${{ github.repository }}/blob/${{ steps.tag-version.outputs.new-tag }}/CHANGELOG.md
+          body: ${{ github.server_url }}/${{ github.repository }}/blob/${{ steps.tag-version.outputs.new-tag }}/CHANGELOG.md
           artifacts: "./dist/*.nupkg,./dist/*.snupkg"
           prerelease: ${{ inputs.is-prerelease }}

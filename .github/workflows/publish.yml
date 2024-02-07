@@ -16,6 +16,11 @@ on:
         required: false
         default: false
         type: boolean
+      skip-nuget:
+        description: if true, skip push to nuget
+        required: false
+        default: false
+        type: boolean
     secrets:
       NUGET_KEY:
         description: "NuGet API key"
@@ -31,7 +36,8 @@ jobs:
         with:
           name: ${{ inputs.artifact-name }}
           path: dist
-      - name: Upload nuget
+      - name: Push to NuGet
+        if: ${{ !inputs.skip-nuget }}
         run: dotnet nuget push "./dist/*.nupkg" --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_KEY }}
       - name: New tag
         id: tag-version

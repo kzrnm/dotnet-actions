@@ -23,6 +23,11 @@ on:
         required: false
         default: ""
         type: string
+      use-openssl1:
+        description: install openssl1.0
+        type: boolean
+        default: false
+        required: false
 
 env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
@@ -48,5 +53,11 @@ jobs:
             ${{ runner.os }}-nuget-
       - name: Build
         run: dotnet build ${{ inputs.target }}
+      - name: openssl 1.0
+        if: inputs.use-openssl1
+        run: |
+          wget http://security.ubuntu.com/ubuntu/pool/main/o/openssl1.0/libssl1.0.0_1.0.2n-1ubuntu5_amd64.deb
+          sudo dpkg -i libssl1.0.0_1.0.2n-1ubuntu5_amd64.deb
       - name: Test
-        run: dotnet test ${{ inputs.target }} --no-build ${{ (inputs.test-logger != '' &&  format('--logger {0}', inputs.test-logger)) || '' }}
+        shell: bash
+        run: dotnet test ${{ inputs.target }} --no-build ${{ inputs.test-logger && format('--logger {0}', inputs.test-logger) }}

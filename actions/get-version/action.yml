@@ -25,7 +25,7 @@ runs:
   using: composite
   steps:
     - name: Get version
-      uses: kzrnm/get-net-sdk-project-versions-action@v2
+      uses: kzrnm/get-net-sdk-project-versions-action@v3
       id: get-version
       with:
         proj-path: ${{ inputs.project-path }}

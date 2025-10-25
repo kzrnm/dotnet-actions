@@ -4,6 +4,7 @@ on:
   workflow_call:
     inputs:
       target:
+        description: Target solution
         required: true
         type: string
       dotnet-version:
@@ -20,6 +21,11 @@ on:
         required: false
         default: ""
         type: string
+      build-before-format:
+        description: Build the solution before `dotnet format`
+        type: boolean
+        default: false
+        required: false
 
 env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
@@ -43,5 +49,8 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Build.props') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
+      - name: Build
+        if: inputs.build-before-format
+        run: dotnet build ${{ inputs.target }}
       - name: Format
         run: dotnet format ${{ inputs.target }} --verify-no-changes

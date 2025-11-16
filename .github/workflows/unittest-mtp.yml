@@ -1,0 +1,76 @@
+name: Unit test on Microsoft.Testing.Platform
+
+on:
+  workflow_call:
+    inputs:
+      solution:
+        type: string
+        description: Target solution
+      project:
+        type: string
+        description: Target project
+      dotnet-version:
+        required: true
+        type: string
+      os:
+        description: Running os
+        required: false
+        default: ubuntu-latest
+        type: string
+      nuget-path:
+        description: path of $NUGET_PACKAGES
+        required: false
+        default: ""
+        type: string
+      use-openssl1:
+        description: install openssl1.0
+        type: boolean
+        default: false
+        required: false
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_NOLOGO: true
+  NUGET_XMLDOC_MODE: skip
+  NUGET_PACKAGES: ${{ inputs.nuget-path }}
+
+jobs:
+  unittest:
+    runs-on: ${{ inputs.os }}
+    steps:
+      - name: Validate inputs
+        id: inputs
+        shell: bash
+        run: |
+          # solution と project のどちらかのみが指定されていることを確認
+          if [ -z "${{ inputs.solution }}" ] && [ -z "${{ inputs.project }}" ]; then
+            echo "Either 'solution' or 'project' input must be provided."
+            exit 1
+          fi
+          if [ -n "${{ inputs.solution }}" ] && [ -n "${{ inputs.project }}" ]; then
+            echo "Only one of 'solution' or 'project' input must be provided."
+            exit 1
+          fi
+          echo "target=${{ inputs.solution }}${{ inputs.project }}" | tee -a $GITHUB_OUTPUT
+      - uses: actions/checkout@v5
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ inputs.dotnet-version }}
+      - uses: actions/cache@v4
+        with:
+          path: ${{ (inputs.nuget-path != '' && inputs.nuget-path ) || '~/.nuget/packages' }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.Build.props') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+      - name: Build
+        run: dotnet build ${{ steps.inputs.outputs.target }}
+      - name: openssl 1.0
+        if: inputs.use-openssl1
+        run: |
+          wget http://security.ubuntu.com/ubuntu/pool/main/o/openssl1.0/libssl1.0.0_1.0.2n-1ubuntu5_amd64.deb
+          sudo dpkg -i libssl1.0.0_1.0.2n-1ubuntu5_amd64.deb
+      - name: Test
+        shell: bash
+        run: dotnet test ${{ inputs.solution && format('--solution {0}', inputs.solution) }} ${{ inputs.project && format('--project {0}', inputs.project) }} --no-build

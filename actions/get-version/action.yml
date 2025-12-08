@@ -30,7 +30,7 @@ runs:
       with:
         proj-path: ${{ inputs.project-path }}
     - name: Check tag
-      uses: mukunku/tag-exists-action@v1.6.0
+      uses: mukunku/tag-exists-action@v1.7.0
       id: check-tag
       with:
         tag: ${{inputs.prefix}}${{ steps.get-version.outputs.version }}

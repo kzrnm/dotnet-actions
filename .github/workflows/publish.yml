@@ -46,6 +46,7 @@ jobs:
         uses: ncipollo/release-action@v1
         id: create-release
         with:
+          commit: ${{ github.sha }}
           tag: ${{ steps.tag-version.outputs.new-tag }}
           name: Version ${{ inputs.version }}
           body: ${{ github.server_url }}/${{ github.repository }}/blob/${{ steps.tag-version.outputs.new-tag }}/CHANGELOG.md

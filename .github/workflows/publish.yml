@@ -12,14 +12,19 @@ on:
         required: true
         type: string
       is-prerelease:
-        description: "if true, Create release as prerelease"
+        description: if true, Create release as prerelease.
         required: false
         default: false
         type: boolean
       skip-nuget:
-        description: if true, skip push to nuget
+        description: if true, skip push to nuget.
         required: false
         default: false
+        type: boolean
+      generateReleaseNotes:
+        description: Indicates if release notes should be automatically generated.
+        default: true
+        required: false
         type: boolean
     secrets:
       NUGET_KEY:
@@ -52,3 +57,4 @@ jobs:
           body: ${{ github.server_url }}/${{ github.repository }}/blob/${{ steps.tag-version.outputs.new-tag }}/CHANGELOG.md
           artifacts: "./dist/*.nupkg,./dist/*.snupkg"
           prerelease: ${{ inputs.is-prerelease }}
+          generateReleaseNotes: ${{ inputs.generateReleaseNotes }}

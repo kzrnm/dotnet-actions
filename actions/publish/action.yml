@@ -1,0 +1,64 @@
+name: Publish NuGet & Release
+description: Publish NuGet & Release
+
+inputs:
+  artifact-name:
+    description: Artifact name
+    required: true
+  version:
+    description: Build version
+    required: true
+  is-prerelease:
+    description: if true, Create release as prerelease.
+    required: false
+    default: "false"
+  skip-nuget:
+    description: if true, skip push to nuget.
+    required: false
+    default: "false"
+  generateReleaseNotes:
+    description: Indicates if release notes should be automatically generated.
+    default: "true"
+    required: false
+  NUGET_KEY:
+    description: "NuGet API key"
+    required: true
+
+outputs:
+  version:
+    description: "Project version"
+    value: ${{ steps.get-version.outputs.version }}
+  is-new:
+    description: "if true, Project version is new version"
+    value: ${{ steps.is-new-version.outputs.is-new }}
+  is-prerelease:
+    description: "if true, Project version is pre-release version"
+    value: ${{ steps.is-new-version.outputs.is-prerelease }}
+
+runs:
+  using: composite
+  steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v8
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: dist
+    - name: Push to NuGet
+      shell: bash
+      if: ${{ !fromJSON(inputs.skip-nuget) }}
+      run: dotnet nuget push "./dist/*.nupkg" --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ inputs.NUGET_KEY }}
+    - name: New tag
+      id: tag-version
+      shell: bash
+      run: echo "new-tag=v${{ inputs.version }}" | tee -a "$GITHUB_OUTPUT"
+    - name: Create release
+      uses: ncipollo/release-action@v1
+      id: create-release
+      with:
+        commit: ${{ github.sha }}
+        tag: ${{ steps.tag-version.outputs.new-tag }}
+        name: Version ${{ inputs.version }}
+        body: ${{ github.server_url }}/${{ github.repository }}/blob/${{ steps.tag-version.outputs.new-tag }}/CHANGELOG.md
+        artifacts: "./dist/*.nupkg,./dist/*.snupkg"
+        prerelease: ${{ fromJSON(inputs.is-prerelease) }}
+        generateReleaseNotes: ${{ fromJSON(inputs.generateReleaseNotes) }}

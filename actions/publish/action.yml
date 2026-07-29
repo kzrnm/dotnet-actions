@@ -20,6 +20,10 @@ inputs:
     description: Indicates if release notes should be automatically generated.
     default: "true"
     required: false
+  tag-prefix:
+    description: Prefix of tag
+    default: "v"
+    required: false
   release-name-prefix:
     description: Prefix of release name
     default: "Version "
@@ -54,7 +58,7 @@ runs:
     - name: New tag
       id: tag-version
       shell: bash
-      run: echo "new-tag=v${{ inputs.version }}" | tee -a "$GITHUB_OUTPUT"
+      run: echo "new-tag=${{ inputs.tag-prefix }}${{ inputs.version }}" | tee -a "$GITHUB_OUTPUT"
     - name: CHANGELOG.md
       id: changelog
       shell: bash

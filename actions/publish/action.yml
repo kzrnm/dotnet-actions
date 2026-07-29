@@ -51,6 +51,15 @@ runs:
       id: tag-version
       shell: bash
       run: echo "new-tag=v${{ inputs.version }}" | tee -a "$GITHUB_OUTPUT"
+    - name: CHANGELOG.md
+      id: changelog
+      shell: bash
+      run: |
+        if [ -f ./CHANGELOG.md ]; then
+          echo "changelog=${{ github.server_url }}/${{ github.repository }}/blob/${{ steps.tag-version.outputs.new-tag }}/CHANGELOG.md" | tee -a "$GITHUB_OUTPUT"
+        else
+          echo "changelog=" | tee -a "$GITHUB_OUTPUT"
+        fi
     - name: Create release
       uses: ncipollo/release-action@v1
       id: create-release
@@ -58,7 +67,7 @@ runs:
         commit: ${{ github.sha }}
         tag: ${{ steps.tag-version.outputs.new-tag }}
         name: Version ${{ inputs.version }}
-        body: ${{ github.server_url }}/${{ github.repository }}/blob/${{ steps.tag-version.outputs.new-tag }}/CHANGELOG.md
+        body: ${{ steps.changelog.outputs.changelog }}
         artifacts: "./dist/*.nupkg,./dist/*.snupkg"
         prerelease: ${{ fromJSON(inputs.is-prerelease) }}
         generateReleaseNotes: ${{ fromJSON(inputs.generateReleaseNotes) }}

@@ -28,6 +28,10 @@ inputs:
     description: Prefix of release name
     default: "Version "
     required: false
+  makeLatest:
+    description: 'Indicates if the release should be the "latest" release or not.'
+    required: false
+    default: 'legacy'
   NUGET_KEY:
     description: "NuGet API key"
     required: true
@@ -79,3 +83,4 @@ runs:
         artifacts: "./dist/*.nupkg,./dist/*.snupkg"
         prerelease: ${{ fromJSON(inputs.is-prerelease) }}
         generateReleaseNotes: ${{ fromJSON(inputs.generateReleaseNotes) }}
+        makeLatest: ${{ inputs.makeLatest }}

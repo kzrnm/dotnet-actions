@@ -20,6 +20,10 @@ inputs:
     description: Indicates if release notes should be automatically generated.
     default: "true"
     required: false
+  release-name-prefix:
+    description: Prefix of release name
+    default: "Version "
+    required: false
   NUGET_KEY:
     description: "NuGet API key"
     required: true
@@ -66,7 +70,7 @@ runs:
       with:
         commit: ${{ github.sha }}
         tag: ${{ steps.tag-version.outputs.new-tag }}
-        name: Version ${{ inputs.version }}
+        name: "${{inputs.release-name-prefix}}${{ inputs.version }}"
         body: ${{ steps.changelog.outputs.changelog }}
         artifacts: "./dist/*.nupkg,./dist/*.snupkg"
         prerelease: ${{ fromJSON(inputs.is-prerelease) }}
